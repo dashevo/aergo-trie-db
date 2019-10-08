@@ -1,0 +1,14 @@
+syntax = "proto3";
+
+service AergoTrieDB {
+    rpc createTrie (CreateTrieRequest) returns (CreateTrieResponse);
+}
+
+message CreateTrieRequest {
+}
+
+message CreateTrieResponse {
+    string trie = 1;
+}
+
+

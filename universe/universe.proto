@@ -1,0 +1,152 @@
+syntax = "proto3";
+
+package universe;
+
+service UniTreeDB {
+  // MetaDB methods
+  rpc ListTrees (Void) returns (ListTreesReply) {}
+  rpc CreateTree (CreateTreeRequest) returns (CreateTreeReply) {}
+  rpc DropTree (DropTreeRequest) returns (DropTreeReply) {}
+  rpc SyncMeta (Void) returns (Void) {}
+
+  // AergoDB methods
+  rpc Update (UpdateRequest) returns (UpdateReply) {}
+  rpc AtomicUpdate (UpdateRequest) returns (UpdateReply) {}
+  rpc Commit (CommitRequest) returns (Void) {}
+  rpc Get (GetRequest) returns (GetReply) {}
+  rpc Stash (StashRequest) returns (Void) {}
+  rpc Revert (RevertRequest) returns (Void) {}
+  rpc MerkleProof (GetRequest) returns (MerkleProofReply) {}
+  rpc MerkleProofCompressed (GetRequest) returns (MerkleProofCompressedReply) {}
+  rpc MerkleProofR (MerkleProofRRequest) returns (MerkleProofReply) {}
+  rpc MerkleProofCompressedR (MerkleProofRRequest) returns (MerkleProofCompressedReply) {}
+  rpc VerifyInclusion (VerifyInclusionRequest) returns (VerifyInclusionReply) {}
+  rpc VerifyNonInclusion (VerifyNonInclusionRequest) returns (VerifyInclusionReply) {}
+  rpc VerifyInclusionC (VerifyInclusionCRequest) returns (VerifyInclusionReply) {}
+  rpc VerifyNonInclusionC (VerifyNonInclusionCRequest) returns (VerifyInclusionReply) {}
+}
+
+message Void {}
+
+message TreeInfo {
+  string name = 1;
+  bytes root = 2;
+  uint32 trie_height = 3;
+  uint32 load_db_counter = 4;
+  uint32 load_cache_counter = 5;
+  uint32 cache_height_limit = 6;
+}
+
+message CreateTreeRequest {
+  string name = 1;
+  uint32 cache_height_limit = 2;
+}
+
+message CreateTreeReply {
+  bool created = 1;
+}
+
+message ListTreesReply {
+  repeated TreeInfo list = 1;
+}
+
+message DropTreeRequest {
+  string name = 1;
+}
+
+message DropTreeReply {
+  bool deleted = 1;
+}
+
+message UpdateRequest {
+  string tree_name = 1;
+  repeated KeyValuePair key_value_pairs = 2;
+}
+
+message UpdateReply {
+  bytes root = 1;
+}
+
+message KeyValuePair {
+  bytes key = 1;
+  bytes value = 2;
+}
+
+message CommitRequest {
+  string tree_name = 1;
+}
+
+message GetRequest {
+  string tree_name = 1;
+  bytes key = 2;
+}
+
+message GetReply {
+  bytes value = 1;
+}
+
+message StashRequest {
+  string tree_name = 1;
+  bool rollback_cache = 2;
+}
+
+message RevertRequest {
+  string tree_name = 1;
+  bytes to_old_root = 2;
+}
+
+message MerkleProof {
+  repeated bytes audit_path = 1;
+  bool included = 2;
+  bytes proof_key = 3;
+  bytes proof_value = 4;
+}
+
+message MerkleProofCompressed {
+  bytes bitmap = 1;
+  repeated bytes audit_path = 2;
+  uint32 height = 3;
+  bool included = 4;
+  bytes proof_key = 5;
+  bytes proof_value = 6;
+}
+
+message MerkleProofReply {
+  MerkleProof merkle_proof = 1;
+}
+
+message MerkleProofCompressedReply {
+  MerkleProofCompressed merkle_proof = 1;
+}
+
+message MerkleProofRRequest {
+  string tree_name = 1;
+  bytes key = 2;
+  bytes root = 3;
+}
+
+message VerifyInclusionReply {
+  bool included = 1;
+}
+
+message VerifyInclusionRequest {
+  string tree_name = 1;
+  MerkleProof merkle_proof = 2;
+}
+
+message VerifyNonInclusionRequest {
+  string tree_name = 1;
+  MerkleProof merkle_proof = 2;
+  bytes proof_key = 3;
+}
+
+message VerifyInclusionCRequest {
+  string tree_name = 1;
+  MerkleProofCompressed merkle_proof = 2;
+}
+
+message VerifyNonInclusionCRequest {
+  string tree_name = 1;
+  MerkleProofCompressed merkle_proof = 2;
+  bytes proof_key = 3;
+}

@@ -1,0 +1,14 @@
+# do not track env vars
+.env
+
+# ignore generated coverage file
+coverage.txt
+
+# ignore data/ dir
+data*/
+
+# ignore compiled protobuf language files
+*.pb.go
+
+# ignore compiled binaries
+bin/

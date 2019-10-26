@@ -103,7 +103,7 @@ message CreateTrieRequest {
 }
 
 message CreateTrieResponse {
-    Result result = 1;
+
 }
 
 // DropTrie
@@ -113,7 +113,7 @@ message DropTrieRequest {
 }
 
 message DropTrieResponse {
-    Result result = 1;
+
 }
 
 // IsTrieExist
@@ -123,10 +123,8 @@ message IsTrieExistRequest {
 }
 
 message IsTrieExistResponse {
-    Result result = 1;
-
     // True if Trie exists
-    bool exist = 2;
+    bool exist = 1;
 }
 
 // Update
@@ -138,7 +136,7 @@ message UpdateRequest {
 }
 
 message UpdateResponse {
-    Result result = 1;
+
 }
 
 // AtomicUpdate
@@ -150,7 +148,7 @@ message AtomicUpdateRequest {
 }
 
 message AtomicUpdateResponse {
-    Result result = 1;
+
 }
 
 // Get
@@ -162,10 +160,8 @@ message GetRequest {
 }
 
 message GetResponse {
-    Result result = 1;
-
     // Undefined if value is empty
-    bytes value = 3;
+    bytes value = 1;
 }
 
 // Commit
@@ -175,7 +171,7 @@ message CommitRequest {
 }
 
 message CommitResponse {
-    Result result = 1;
+
 }
 
 // Stash
@@ -187,7 +183,7 @@ message StashRequest {
 }
 
 message StashResponse {
-    Result result = 1;
+
 }
 
 // Revert
@@ -199,7 +195,7 @@ message RevertRequest {
 }
 
 message RevertResponse {
-    Result result = 1;
+
 }
 
 // GetMerkleProof
@@ -211,12 +207,10 @@ message GetMerkleProofRequest {
 }
 
 message GetMerkleProofResponse {
-    Result result = 1;
-
     // Is key exist
-    bool included = 2;
+    bool included = 1;
 
-    MerkleProof merkle_proof = 3;
+    MerkleProof merkle_proof = 2;
 }
 
 // GetCompressedMerkleProof
@@ -228,12 +222,10 @@ message GetCompressedMerkleProofRequest {
 }
 
 message GetCompressedMerkleProofResponse {
-    Result result = 1;
-
     // Is key exist
-    bool included = 2;
+    bool included = 1;
 
-    MerkleProofCompressed merkle_proof = 3;
+    MerkleProofCompressed merkle_proof = 2;
 }
 
 // GetPastMerkleProof
@@ -246,12 +238,10 @@ message GetPastMerkleProofRequest {
 }
 
 message GetPastMerkleProofResponse {
-    Result result = 1;
-
     // Is key exist
-    bool included = 2;
+    bool included = 1;
 
-    MerkleProof merkle_proof = 3;
+    MerkleProof merkle_proof = 2;
 }
 
 // VerifyInclusion
@@ -263,9 +253,7 @@ message VerifyInclusionRequest {
 }
 
 message VerifyInclusionResponse {
-    Result result = 1;
-
-    bool valid = 2;
+    bool valid = 1;
 }
 
 // VerifyNonInclusion
@@ -279,9 +267,7 @@ message VerifyNonInclusionRequest {
 }
 
 message VerifyNonInclusionResponse {
-    Result result = 1;
-
-    bool valid = 2;
+    bool valid = 1;
 }
 
 // VerifyCompressedInclusion
@@ -293,9 +279,7 @@ message VerifyCompressedInclusionRequest {
 }
 
 message VerifyCompressedInclusionResponse {
-    Result result = 1;
-
-    bool valid = 2;
+    bool valid = 1;
 }
 
 // VerifyCompressedNonInclusion
@@ -309,9 +293,7 @@ message VerifyCompressedNonInclusionRequest {
 }
 
 message VerifyCompressedNonInclusionResponse {
-    Result result = 1;
-
-    bool valid = 2;
+    bool valid = 1;
 }
 
 // Generic messages
@@ -336,21 +318,7 @@ message MerkleProofCompressed {
     bytes value = 7;
 }
 
-message Result {
-    bool ok = 1;
-    Error error = 2;
-}
-
-message Error {
-    uint32 code = 1;
-    string message = 2;
-}
-
 message KeyValue {
     bytes key = 1;
     bytes value = 2;
 }
-
-
-
-

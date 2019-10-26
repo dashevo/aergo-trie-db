@@ -1,14 +1,356 @@
 syntax = "proto3";
 
-service AergoTrieDB {
+package org.dash.universeTrieDB.v0;
+
+service UniverseTrieDB {
+    // Create a new Trie
     rpc createTrie (CreateTrieRequest) returns (CreateTrieResponse);
+
+    // Drop existing Trie
+    rpc dropTrie (DropTrieRequest) returns (DropTrieResponse);
+
+    // Is Trie exist
+    rpc isTrieExist(IsTrieExistRequest) returns (IsTrieExistResponse);
+
+    // Update will recursively go down the tree and split the keys and values
+    // according to the side of the tree they belong to:
+    // multiple parts of the tree can be simultaneously updated.
+    //
+    // If update is called several times before Commit, only the last state is committed.
+    rpc update(UpdateRequest) returns (UpdateResponse);
+
+    // AtomicUpdate updates the tree with sorted keys and values just like Update
+    // But unlike update, if AtomicUpdate is called several times before Commit,
+    // all the intermediate states from AtomicUpdate calls will be recorded.
+    // This can be useful when authenticating the state of each block,
+    // but not committing to the database right away.
+    //
+    // calls AtomicUpdate func
+    rpc atomicUpdate(AtomicUpdateRequest) returns (AtomicUpdateResponse);
+
+    // Get the value of a key stored in the tree,
+    // if a key is default, i.e., not stored, return nil.
+    rpc get(GetRequest) returns (GetResponse);
+
+    // Commit the updated nodes to the storage.
+    // When update is called, the new nodes are stored in smt.db.updatedNodes.
+    // Commit then stores to disk.
+    rpc commit(CommitRequest) returns (CommitResponse);
+
+    // Use the Stash function to revert the update without committing.
+    rpc stash(StashRequest) returns (StashResponse);
+
+    // When revert is called, the trees to rollback (between the current tree and toOldRoot)
+    // are deleted from the database.
+    rpc revert(RevertRequest) returns (RevertResponse);
+
+    // Creates a Merkle proof of inclusion/non-inclusion of the key.
+    // The Merkle proof is an array of hashes.
+    //
+    // If the key is not included, MerkleProof will return false
+    // along with the proof leaf on the path of the key.
+    //
+    // calls MerkleProof func
+    rpc getMerkleProof(GetMerkleProofRequest) returns (GetMerkleProofResponse);
+
+    // Creates the same Merkle proof as MerkleProof but compressed using a bitmap
+    //
+    // calls MerkleProofCompressed func
+    rpc getCompressedMerkleProof(GetCompressedMerkleProofRequest) returns (GetCompressedMerkleProofResponse);
+
+    // Creates a Merkle proof of inclusion/non-inclusion of the key at a given trie root.
+    // This is used to query state at a different block than the last one.
+    //
+    // calls MerkleProofPast func
+    rpc getPastMerkleProof(GetPastMerkleProofRequest) returns (GetPastMerkleProofResponse);
+
+    // Verifies that the key-value pair is included in the tree at the current Root.
+    rpc verifyInclusion(VerifyInclusionRequest) returns (VerifyInclusionResponse);
+
+    // Verify a proof of non-inclusion.
+    //
+    // Verifies that a leaf(proofKey, proofValue, height) of empty subtree is on the path
+    // of the non-included key.
+    rpc verifyNonInclusion(VerifyNonInclusionRequest) returns (VerifyNonInclusionResponse)
+
+    // Verifies a compressed proof of inclusion.
+    // ‘length’ is the height of the leaf key-value being verified.
+    //
+    // calls VerifyInclusionC func
+    rpc verifyCompressedInclusion(VerifyCompressedInclusionRequest) returns (VerifyCompressedInclusionResponse);
+
+    // Verify a compressed proof of non-inclusion.
+    // Verifies that a leaf (proofKey, proofValue, height) of empty subtree is on the path
+    // of the non-included key.
+    //
+    // calls VerifyNonInclusionC func
+    rpc verifyCompressedNonInclusion(VerifyCompressedNonInclusionRequest) returns (VerifyCompressedNonInclusionResponse);
 }
 
+//
+// Requests and Responses
+//
+
+// CreateTrie
+
 message CreateTrieRequest {
+    // Trie name: [0-1a-zA-Z_\-]{1, 64}
+    string name = 1;
+
+    // The number of tree levels we want to store in cache.
+    // The whole tree by default.
+    uint32 cache_height_limit = 2;
 }
 
 message CreateTrieResponse {
-    string trie = 1;
+    Result result = 1;
 }
+
+// DropTrie
+
+message DropTrieRequest {
+    string name = 1;
+}
+
+message DropTrieResponse {
+    Result result = 1;
+}
+
+// IsTrieExist
+
+message IsTrieExistRequest {
+    string name = 1;
+}
+
+message IsTrieExistResponse {
+    Result result = 1;
+
+    // True if Trie exists
+    bool exist = 2;
+}
+
+// Update
+
+message UpdateRequest {
+    string trie_name = 1;
+
+    repeated KeyValue keys_values = 2;
+}
+
+message UpdateResponse {
+    Result result = 1;
+}
+
+// AtomicUpdate
+
+message AtomicUpdateRequest {
+    string trie_name = 1;
+
+    repeated KeyValue keys_values = 2;
+}
+
+message AtomicUpdateResponse {
+    Result result = 1;
+}
+
+// Get
+
+message GetRequest {
+     string trie_name = 1;
+
+     bytes key = 2;
+}
+
+message GetResponse {
+    Result result = 1;
+
+    // Undefined if value is empty
+    bytes value = 3;
+}
+
+// Commit
+
+message CommitRequest {
+    string trie_name = 1;
+}
+
+message CommitResponse {
+    Result result = 1;
+}
+
+// Stash
+
+message StashRequest {
+    string trie_name = 1;
+
+    bool rollback_cache = 2;
+}
+
+message StashResponse {
+    Result result = 1;
+}
+
+// Revert
+
+message RevertRequest {
+    string trie_name = 1;
+
+    bytes old_root = 2;
+}
+
+message RevertResponse {
+    Result result = 1;
+}
+
+// GetMerkleProof
+
+message GetMerkleProofRequest {
+    string trie_name = 1;
+
+    bytes key = 2;
+}
+
+message GetMerkleProofResponse {
+    Result result = 1;
+
+    // Is key exist
+    bool included = 2;
+
+    MerkleProof merkle_proof = 3;
+}
+
+// GetCompressedMerkleProof
+
+message GetCompressedMerkleProofRequest {
+    string trie_name = 1;
+
+    bytes key = 2;
+}
+
+message GetCompressedMerkleProofResponse {
+    Result result = 1;
+
+    // Is key exist
+    bool included = 2;
+
+    MerkleProofCompressed merkle_proof = 3;
+}
+
+// GetPastMerkleProof
+
+message GetPastMerkleProofRequest {
+    string trie_name = 1;
+
+    bytes key = 2;
+    bytes root = 3;
+}
+
+message GetPastMerkleProofResponse {
+    Result result = 1;
+
+    // Is key exist
+    bool included = 2;
+
+    MerkleProof merkle_proof = 3;
+}
+
+// VerifyInclusion
+
+message VerifyInclusionRequest {
+    string trie_name = 1;
+
+    MerkleProof merkle_proof = 2;
+}
+
+message VerifyInclusionResponse {
+    Result result = 1;
+
+    bool valid = 2;
+}
+
+// VerifyNonInclusion
+
+message VerifyNonInclusionRequest {
+    string trie_name = 1;
+
+    bytes key = 2;
+
+    MerkleProof merkle_proof = 3;
+}
+
+message VerifyNonInclusionResponse {
+    Result result = 1;
+
+    bool valid = 2;
+}
+
+// VerifyCompressedInclusion
+
+message VerifyCompressedInclusionRequest {
+    string trie_name = 1;
+
+    MerkleProofCompressed merkle_proof = 2;
+}
+
+message VerifyCompressedInclusionResponse {
+    Result result = 1;
+
+    bool valid = 2;
+}
+
+// VerifyCompressedNonInclusion
+
+message VerifyCompressedNonInclusionRequest {
+    string trie_name = 1;
+
+    bytes key = 2;
+
+    MerkleProofCompressed merkle_proof = 3;
+}
+
+message VerifyCompressedNonInclusionResponse {
+    Result result = 1;
+
+    bool valid = 2;
+}
+
+// Generic messages
+
+message MerkleProof {
+    // Merkle proof
+    repeated bytes audit_path = 1;
+
+    bytes key = 2;
+    bytes value = 3;
+}
+
+message MerkleProofCompressed {
+    // Bitmap with nil values
+    bytes bitmap = 2;
+    // Merkle proof
+    repeated bytes audit_path = 3;
+
+    uint64 height = 4;
+
+    bytes key = 6;
+    bytes value = 7;
+}
+
+message Result {
+    bool ok = 1;
+    Error error = 2;
+}
+
+message Error {
+    uint32 code = 1;
+    string message = 2;
+}
+
+message KeyValue {
+    bytes key = 1;
+    bytes value = 2;
+}
+
+
 
 

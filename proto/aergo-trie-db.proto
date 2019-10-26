@@ -60,6 +60,11 @@ service UniverseTrieDB {
     // calls MerkleProofCompressed func
     rpc getCompressedMerkleProof(GetCompressedMerkleProofRequest) returns (GetCompressedMerkleProofResponse);
 
+    // Creates many compressed Merkle proofs using a bitmap
+    //
+    // calls MerkleProofCompressed func
+    rpc getManyCompressedMerkleProofs(GetManyCompressedMerkleProofsRequest) returns (GetManyCompressedMerkleProofsResponse);
+
     // Creates a Merkle proof of inclusion/non-inclusion of the key at a given trie root.
     // This is used to query state at a different block than the last one.
     //
@@ -223,9 +228,6 @@ message GetMerkleProofRequest {
 }
 
 message GetMerkleProofResponse {
-    // Is key exist
-    bool included = 1;
-
     MerkleProof merkle_proof = 2;
 }
 
@@ -238,11 +240,21 @@ message GetCompressedMerkleProofRequest {
 }
 
 message GetCompressedMerkleProofResponse {
-    // Is key exist
-    bool included = 1;
-
-    MerkleProofCompressed merkle_proof = 2;
+    MerkleProofCompressed merkle_proof = 1;
 }
+
+// GetManyCompressedMerkleProofs
+
+message GetManyCompressedMerkleProofsRequest {
+    string trie_name = 1;
+
+    repeated bytes keys = 2;
+}
+
+message GetManyCompressedMerkleProofsResponse {
+    repeated MerkleProofCompressed merkle_proof = 1;
+}
+
 
 // GetPastMerkleProof
 
@@ -254,10 +266,7 @@ message GetPastMerkleProofRequest {
 }
 
 message GetPastMerkleProofResponse {
-    // Is key exist
-    bool included = 1;
-
-    MerkleProof merkle_proof = 2;
+    MerkleProof merkle_proof = 1;
 }
 
 // VerifyInclusion
@@ -315,14 +324,20 @@ message VerifyCompressedNonInclusionResponse {
 // Generic messages
 
 message MerkleProof {
-    // Merkle proof
-    repeated bytes audit_path = 1;
+    // True if key exist
+    bool included = 1;
 
-    bytes key = 2;
-    bytes value = 3;
+    // Merkle proof
+    repeated bytes audit_path = 2;
+
+    bytes key = 3;
+    bytes value = 4;
 }
 
 message MerkleProofCompressed {
+    // True if key exist
+    bool included = 1;
+
     // Bitmap with nil values
     bytes bitmap = 2;
     // Merkle proof
@@ -330,8 +345,8 @@ message MerkleProofCompressed {
 
     uint64 height = 4;
 
-    bytes key = 6;
-    bytes value = 7;
+    bytes key = 5;
+    bytes value = 6;
 }
 
 message KeyValue {

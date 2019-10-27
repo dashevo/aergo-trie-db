@@ -105,7 +105,6 @@ message CreateTrieRequest {
     string name = 1;
 
     // The number of tree levels we want to store in cache.
-    // The whole tree by default.
     uint32 cache_height_limit = 2;
 }
 

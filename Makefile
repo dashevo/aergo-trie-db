@@ -3,12 +3,15 @@ SHELL = bash
 
 COVERAGE_FILE ?= coverage.txt
 
-.PHONY: default fmt test cover goimports lint vet help clean image protoc build
+.PHONY: default test cover goimports lint vet help clean protoc build check
 
 default:  protoc goimports lint vet build ## Run default target : all lints + test
 
-fmt:  ## Run go fmt to format Go files
-	go fmt ./...
+check_format:  ## Check formatting
+	$(eval GOIMPORTS=$(shell goimports -d .))
+	@if [ "x$(GOIMPORTS)" != "x" ]; then echo "Go files must be formatted with goimports"; goimports -d -e .; exit 1; fi
+
+check: check_format lint ## Run Go format and lint checks
 
 test:  ## Run a basic test suite
 	go test
@@ -23,7 +26,7 @@ goimports:  ## Run goimports to format code
 	goimports -w .
 
 lint:  ## Lint all go code in project
-	golint ./...
+	golint -set_exit_status ./...
 
 vet:  ## Go vet all project code
 	go vet ./...

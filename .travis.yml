@@ -4,10 +4,14 @@ language: go
 go:
   - '1.13'
 
+services:
+  - docker
+
 before_install:
   - go get -u golang.org/x/tools/cmd/goimports
   - go get -u golang.org/x/lint/golint
   - go get -u github.com/golang/protobuf/protoc-gen-go
+  - go get -u github.com/nmarley/semvertool/cmd/semvertool
 
 addons:
   apt:
@@ -18,3 +22,10 @@ addons:
 script:
   - make check
   - make
+
+deploy:
+  provider: script
+  script: bash docker-deploy.sh "$TRAVIS_TAG"
+  on:
+    tags: true
+    repo: dashevo/universe-tree-db

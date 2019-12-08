@@ -1,5 +1,7 @@
 # Universe Tree DB
 
+[![Build Status](https://img.shields.io/travis/com/dashevo/universe-tree-db.svg?branch=master&style=flat-square)](https://travis-ci.com/dashevo/universe-tree-db)
+
 > A gRPC service wrapped around the [Aergo State Trie](https://github.com/aergoio/aergo/tree/develop/pkg/trie)
 
 This service also includes metadata about the trees stored in BadgerDB.

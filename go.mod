@@ -5,7 +5,7 @@ go 1.13
 require (
 	github.com/AndreasBriese/bbloom v0.0.0-20190825152654-46b345b51c96 // indirect
 	github.com/aergoio/aergo v1.3.1
-	github.com/aergoio/aergo-lib v0.0.0-20191115072213-6103468b06ac
+	github.com/aergoio/aergo-lib v1.0.0
 	github.com/dgraph-io/badger v1.6.0
 	github.com/dgryski/go-farm v0.0.0-20191112170834-c2139c5d712b // indirect
 	github.com/golang/protobuf v1.3.2

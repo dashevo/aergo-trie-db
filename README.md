@@ -18,7 +18,7 @@ This service also includes metadata about the trees stored in BadgerDB.
 ### Prerequisites
 
 - Go 1.12+ (use gvm or your system's package manager)
-- Protobuf Compiler (use your package manager to install `protobuf-compiler`)
+- Protobuf Compiler (use your package manager to install `protobuf-compiler` or equivalent)
 - Go tools and protobuf plugin:
 
 ```sh

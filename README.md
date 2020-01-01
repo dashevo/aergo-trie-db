@@ -15,16 +15,26 @@ This service also includes metadata about the trees stored in BadgerDB.
 
 ## Build
 
+### Prerequisites
+
+- Go 1.12+ (use gvm or your system's package manager)
+- Protobuf Compiler (use your package manager to install `protobuf-compiler` or equivalent)
+- Go tools and protobuf plugin:
+
+```sh
+go get -u golang.org/x/tools/cmd/goimports
+go get -u golang.org/x/lint/golint
+go get -u github.com/golang/protobuf/protoc-gen-go
+```
+
+### Build Binaries
+
 ```sh
 git clone https://github.com/dashevo/universe-tree-db.git
 cd universe-tree-db
 
 make
 ```
-
-### Prerequisites
-
-- Go 1.12+
 
 ### Compile Protobuf Schema
 
